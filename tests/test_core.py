@@ -80,5 +80,13 @@ class TestBrainTumorProject(unittest.TestCase):
         # Kiểm tra output shape (batch_size, num_classes)
         self.assertEqual(output.shape, (1, NUM_CLASSES))
 
+    def test_mri_preprocessor_pipeline(self):
+        """Kiểm tra pipeline tiền xử lý ảnh grayscale và RGB chuẩn y tế."""
+        from src.mri_preprocessing import MRIPreprocessor
+        rgb_arr = MRIPreprocessor.from_pil_to_rgb_array(self.fake_img)
+        self.assertEqual(rgb_arr.shape, (300, 300, 3))
+        self.assertEqual(rgb_arr.dtype, np.uint8)
+
 if __name__ == '__main__':
     unittest.main()
+

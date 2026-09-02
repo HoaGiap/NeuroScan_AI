@@ -18,6 +18,8 @@ python train.py --backbone efficientnet_v2_s --data ./data --epochs 50 --batch 3
 import os
 import sys
 import time
+
+sys.stdout.reconfigure(encoding="utf-8")
 import argparse
 import json
 from pathlib import Path
@@ -43,21 +45,21 @@ from src.models.registry import build_resnet50, build_efficientnet
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 DEFAULT_CONFIG = {
-    "img_size":      224,
-    "batch_size":    32,
-    "epochs":        50,
-    "lr":            1e-4,
-    "weight_decay":  1e-4,
-    "dropout":       0.4,
-    "patience":      10,          # Early stopping patience
-    "min_delta":     0.001,       # Min improvement
-    "label_smooth":  0.1,         # Label smoothing epsilon
-    "num_workers":   4,
-    "scheduler":     "cosine",    # 'cosine' | 'onecycle'
-    "mode":          "finetune",  # 'finetune' | 'feature' | 'partial'
-    "mixed_prec":    True,        # AMP mixed precision
-    "grad_clip":     1.0,         # Gradient clipping
-    "warmup_epochs": 5,           # Warmup cho feature mode trước finetune
+    "img_size":      224,   # Kích thước ảnh đầu vào
+    "batch_size":    32,    # Số lượng ảnh mỗi batch
+    "epochs":        50,    # Số epoch huấn luyện
+    "lr":            1e-4,  # Learning rate
+    "weight_decay":  1e-4,  # Weight decay
+    "dropout":       0.4,   # Dropout rate
+    "patience":      10,    # Early stopping patience
+    "min_delta":     0.001, # Min improvement
+    "label_smooth":  0.1,   # Label smoothing epsilon
+    "num_workers":   4,     # Số lượng worker
+    "scheduler":     "cosine", # 'cosine' | 'onecycle'
+    "mode":          "finetune", # 'finetune' | 'feature' | 'partial'
+    "mixed_prec":    True,     # AMP mixed precision
+    "grad_clip":     1.0,      # Gradient clipping
+    "warmup_epochs": 5,      # Warmup cho feature mode trước finetune
 }
 
 
@@ -73,8 +75,8 @@ class LabelSmoothingCrossEntropy(nn.Module):
         smooth_val = self.smoothing / (self.num_classes - 1)
 
         log_prob = torch.log_softmax(pred, dim=-1)
-        nll_loss = -log_prob.gather(dim=-1, index=target.unsqueeze(1)).squeeze(1)
-        smooth_loss = -log_prob.mean(dim=-1)
+        nll_loss = -log_prob.gather(dim=-1, index=target.unsqueeze(1)).squeeze(1)    # Loss thông thường
+        smooth_loss = -log_prob.mean(dim=-1)   # Loss làm mịn phân bổ đều cho các lớp
         loss = confidence * nll_loss + smooth_val * smooth_loss * self.num_classes
         return loss.mean()
 
@@ -144,44 +146,45 @@ def run_epoch(
     epoch: int = 0,
 ) -> tuple[float, float, list, list]:
 
-    model.train() if is_train else model.eval()
-    tracker = MetricTracker()
+    model.train() if is_train else model.eval() # Chế độ train hoặc eval
+
+    tracker = MetricTracker() # Khởi tạo MetricTracker
 
     pbar = tqdm(loader, desc=f"{'Train' if is_train else 'Val ':5s}",
-                leave=False, dynamic_ncols=True)
+                leave=False, dynamic_ncols=True) # Thanh tiến trình
 
-    ctx = torch.enable_grad() if is_train else torch.no_grad()
+    ctx = torch.enable_grad() if is_train else torch.no_grad() # Context manager
     with ctx:
-        for imgs, labels in pbar:
-            imgs, labels = imgs.to(device, non_blocking=True), labels.to(device, non_blocking=True)
+        for imgs, labels in pbar: # Lặp qua từng batch
+            imgs, labels = imgs.to(device, non_blocking=True), labels.to(device, non_blocking=True) # Chuyển data lên GPU
 
             if is_train:
-                optimizer.zero_grad(set_to_none=True)
-                with torch.autocast(device_type="cuda" if device.type == "cuda" else "cpu", enabled=(scaler is not None)):
-                    logits = model(imgs)
-                    loss = criterion(logits, labels)
+                optimizer.zero_grad(set_to_none=True) # Reset gradients
+                with torch.autocast(device_type="cuda" if device.type == "cuda" else "cpu", enabled=(scaler is not None)): # Tính toán bằng float16
+                    logits = model(imgs) # Forward pass
+                    loss = criterion(logits, labels) # Tính loss
 
                 if scaler:
-                    scaler.scale(loss).backward()
-                    scaler.unscale_(optimizer)
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-                    scaler.step(optimizer)
-                    scaler.update()
+                    scaler.scale(loss).backward() # Backward pass (float16)
+                    scaler.unscale_(optimizer) # Chuyển lại float32
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip) # Clip gradients
+                    scaler.step(optimizer) # Cập nhật weights
+                    scaler.update() # Cập nhật scaler
                 else:
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-                    optimizer.step()
+                    loss.backward() # Backward pass
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip) # Clip gradients
+                    optimizer.step() # Cập nhật weights
 
                 if scheduler and isinstance(scheduler, OneCycleLR):
-                    scheduler.step()
+                    scheduler.step() # Update scheduler
             else:
-                with torch.autocast(device_type="cuda" if device.type == "cuda" else "cpu", enabled=(scaler is not None)):
-                    logits = model(imgs)
-                    loss = criterion(logits, labels)
+                with torch.autocast(device_type="cuda" if device.type == "cuda" else "cpu", enabled=(scaler is not None)): # Tính toán bằng float16
+                    logits = model(imgs) # Forward pass
+                    loss = criterion(logits, labels) # Tính loss
 
-            preds = logits.argmax(dim=1)
+            preds = logits.argmax(dim=1) # Lấy dự đoán Class có xác suất cao nhất
             tracker.update(loss.item() * imgs.size(0), preds, labels)
-            pbar.set_postfix(loss=f"{tracker.avg_loss:.4f}", acc=f"{tracker.accuracy:.1f}%")
+            pbar.set_postfix(loss=f"{tracker.avg_loss:.4f}", acc=f"{tracker.accuracy:.1f}%") # Hiển thị loss và accuracy
 
     return tracker.avg_loss, tracker.accuracy, tracker.all_preds, tracker.all_labels
 
@@ -342,7 +345,7 @@ def train_model(backbone: str, args, cfg: dict) -> dict:
         if val_acc > best_acc:
             best_acc = val_acc
             save_checkpoint(model, optimizer, epoch, val_acc, best_ckpt)
-            print(f"  ✓ New best: {best_acc:.2f}% → saved to {best_ckpt}")
+            print(f"  [NEW BEST] {best_acc:.2f}% -> saved to {best_ckpt}")
 
         if early_stop(val_acc):
             print(f"\n  Early stopping triggered at epoch {epoch}!")

@@ -60,12 +60,12 @@ Hệ thống cung cấp tính minh bạch (XAI) nhằm tăng độ tin cậy đ�
 - **Tạo Heatmap Trực Quan**: Áp dụng thuật toán Grad-CAM++ để highlight những vùng pixels / cấu trúc não bộ ảnh hưởng trức tiếp đến quyết định của model.
 - **So Sánh Chéo Modals/Kiến trúc**: Tính năng hỗ trợ chạy đa mô hình giúp bác sĩ có cái nhìn tương phản logic (nếu cung cấp nhiều checkpoint weight).
 
-### 🎨 Trải Nghiệm Người Dùng (Giao Diện Web)
+### 📋 Bộ Công Cụ Lâm Sàng & Báo Cáo Y Tế (Clinical Suite)
 
-- **Cơ chế Kéo Thả (Drag & Drop)**: Trải nghiệm tương tác form upload file y tế mượt mà, tiện lợi.
-- **Biểu Đồ So Sánh Trực Quan**: Phân tích hiển thị Progress Bar đánh giá probability (xác suất) rủi ro trên mọi bệnh án.
-- **Animation Quét Lớp**: Bổ sung hiệu ứng scanning chạy dọc ảnh trong lúc mô hình tính toán giúp nhận diện trực quan.
-- **Tốc Độ Phản Hồi Dữ Liệu**: Giao diện cập nhật logic API Response ngay tại chỗ kết hợp với xử lý Fetch không cần phải Reload trang.
+- **📄 Xuất Báo Cáo Y Tế Chuẩn PDF**: Xuất phiếu chẩn đoán y tế hoàn chỉnh (Header bệnh viện, mã bệnh án, ảnh đối chiếu 1:1 MRI & Grad-CAM++, bảng % xác suất, khuyến nghị lâm sàng, chữ ký bác sĩ) với một chạm thông qua `html2pdf.js` hoặc chế độ in chuẩn A4.
+- **🏥 Hỗ Trợ Định Dạng Y Tế Chuẩn DICOM (`.dcm`)**: Đọc và giải mã dữ liệu điểm ảnh y tế bằng `pydicom`, tự động trích xuất metadata (Patient ID, Name, Age, Sex, Modality) điền vào hồ sơ bệnh nhân.
+- **🔍 Bộ Công Cụ Tương Tác Ảnh Y Khoa (Medical Viewport Tools)**: Tích hợp thanh công cụ điều chỉnh Độ tương phản (Contrast/Windowing), Độ sáng (Brightness), Đảo màu âm bản (Invert), Phóng to/Thu nhỏ (Zoom/Pan), Khôi phục gốc (Reset).
+- **👤 Quản Lý Thông Tin Ca Khám**: Form quản lý hồ sơ bệnh nhân, hỗ trợ tự sinh thông tin lâm sàng mẫu để demo nhanh chóng.
 
 ---
 

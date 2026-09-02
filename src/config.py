@@ -3,6 +3,9 @@ config.py — Centralized Configuration for NeuroScan AI
 """
 
 import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
 from pathlib import Path
 import torch
 
@@ -25,7 +28,7 @@ CLASS_VI = {
 
 # ─── Training Hyperparameters ────────────────────────────────────────────────
 DEFAULT_TRAIN_CONFIG = {
-    "batch_size": 32,
+    "batch_size": 32,   
     "lr": 1e-4,
     "epochs": 50,
     "dropout": 0.4,

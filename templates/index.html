@@ -4,143 +4,484 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeuroScan AI — Brain Tumor MRI Classifier</title>
+  <title>NeuroScan AI — Brain MRI Classifier</title>
+  
+  <!-- Fonts: Lora + Be Vietnam Pro + Plus Jakarta Sans + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Line Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- html2pdf.js for Client-Side Medical Report Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=1.1">
+  <!-- Favicon & Styles -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=4.1">
 </head>
 
-<body>
-  <header>
-    <div class="container">
-      <div class="header-inner">
-        <div class="logo">
-          <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+<body class="minimalist-theme">
+
+  <!-- Editorial Top Status Header -->
+  <header class="site-header">
+    <div class="container-wide">
+      <div class="header-content">
+        <div class="brand-group">
+          <div class="brand-symbol">
+            <img src="{{ url_for('static', filename='logobrain.png') }}" alt="NeuroScan Logo">
+          </div>
           <div>
-            <h1>NeuroScan <span>AI</span></h1>
-            <p>HỆ THỐNG PHÂN LOẠI KHỐI U NÃO · EFFICIENTNET-V2-S· GRAD-CAM++</p>
+            <h1 class="brand-name">NeuroScan <em>AI</em></h1>
+            <span class="brand-tagline">Clinical MRI Classification & Diagnostic Report System</span>
           </div>
         </div>
-        <div class="status-pill">
-          <div class="status-dot"></div>
-          Med-AI
+
+        <div class="header-meta">
+          <div class="model-badge">
+            <span class="dot-indicator"></span>
+            <span>EfficientNet-V2-S &bull; CUDA Accelerated</span>
+          </div>
+          <div class="shortcut-hint">
+            <span class="mono-label">Phím tắt:</span>
+            <kbd>⌘</kbd> + <kbd>U</kbd> Tải ảnh
+          </div>
         </div>
-      </div>
-      <div class="warning">
-        <span>⚠</span>
-        <span>Công cụ <strong>hỗ trợ nghiên cứu</strong> — KHÔNG thay thế chẩn đoán y tế chuyên nghiệp.
-          Mọi kết quả cần được xác nhận bởi bác sĩ chuyên khoa.</span>
       </div>
     </div>
   </header>
 
-  <main>
-    <div class="container">
-      <div class="grid">
+  <main class="site-main">
+    <div class="container-wide">
+      
+      <!-- Editorial Hero & Metric Bento Strip -->
+      <section class="hero-bento-strip">
+        <div class="bento-metric">
+          <span class="metric-label">ĐỘ CHÍNH XÁC TEST SET</span>
+          <span class="metric-value">99.24%</span>
+          <span class="metric-sub">1,311 mẫu kiểm thử độc lập</span>
+        </div>
+        <div class="bento-metric">
+          <span class="metric-label">PHÂN LOẠI TỔN THƯƠNG</span>
+          <span class="metric-value">4 Lớp</span>
+          <span class="metric-sub">Glioma &bull; Meningioma &bull; Pituitary &bull; No Tumor</span>
+        </div>
+        <div class="bento-metric">
+          <span class="metric-label">GIẢI THÍCH THỊ GIÁC AI</span>
+          <span class="metric-value">Grad-CAM++</span>
+          <span class="metric-sub">Khoanh vùng mật độ bất thường</span>
+        </div>
+        <div class="bento-metric">
+          <span class="metric-label">HỖ TRỢ ĐỊNH DẠNG</span>
+          <span class="metric-value">DICOM + Ảnh</span>
+          <span class="metric-sub">DCM, JPG, PNG, TIFF, BMP</span>
+        </div>
+      </section>
 
-        <!-- ── LEFT: Upload + Image ── -->
-        <div>
-          <div class="card">
-            <div class="card-header">
-              <span><i class="fa-regular fa-image"></i></span>
-              <span class="card-title">Ảnh MRI đầu vào</span>
+      <!-- Medical Disclaimer Bar -->
+      <div class="disclaimer-bar">
+        <i class="fa-solid fa-circle-info disclaimer-icon"></i>
+        <p><strong>Công cụ hỗ trợ chẩn đoán:</strong> Kết quả phân tích dùng cho nghiên cứu và tham khảo lâm sàng. Mọi chẩn đoán chính thức cần dựa trên ý kiến của bác sĩ chuyên khoa Chẩn đoán hình ảnh.</p>
+      </div>
+
+      <!-- Main Workspace Grid (Bento Box Architecture) -->
+      <div class="workspace-grid">
+
+        <!-- LEFT COLUMN: MRI Input & Medical Viewer -->
+        <div class="grid-column">
+          
+          <!-- Bento Box: Upload & Viewer -->
+          <div class="bento-box">
+            
+            <!-- Faux macOS Window Header -->
+            <div class="os-window-header">
+              <div class="os-controls">
+                <span class="os-dot dot-close"></span>
+                <span class="os-dot dot-min"></span>
+                <span class="os-dot dot-max"></span>
+              </div>
+              <div class="os-title">MRI_SCANNER_VIEWPORT.dicom</div>
+              <div class="os-status" id="windowStatus">CHỜ TỆP ẢNH / DICOM</div>
             </div>
-            <div class="card-body">
 
-              <!-- Drop zone -->
-              <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                <div class="icon"><i class="fa-regular fa-image"></i></div>
-                <p>Kéo thả hoặc click để chọn ảnh MRI</p>
-                <small>JPG · PNG · BMP · TIFF</small>
-              </div>
-
-              <!-- Image preview -->
-              <div class="img-wrapper" id="imgWrapper">
-                <img id="previewImg" src="" alt="MRI Preview" />
-                <div class="scan-overlay" id="scanOverlay">
-                  <div class="scan-line"></div>
+            <div class="bento-content">
+              
+              <!-- Quick Sample Selector -->
+              <div class="quick-samples-wrapper">
+                <span class="samples-title">MẪU THỬ NHANH:</span>
+                <div class="samples-buttons">
+                  <button type="button" class="sample-btn btn-meningioma" onclick="loadSample('meningioma')">
+                    <span class="pill-dot"></span> U màng não
+                  </button>
+                  <button type="button" class="sample-btn btn-glioma" onclick="loadSample('glioma')">
+                    <span class="pill-dot"></span> U thần kinh đệm
+                  </button>
+                  <button type="button" class="sample-btn btn-pituitary" onclick="loadSample('pituitary')">
+                    <span class="pill-dot"></span> U tuyến yên
+                  </button>
+                  <button type="button" class="sample-btn btn-notumor" onclick="loadSample('notumor')">
+                    <span class="pill-dot"></span> Bình thường
+                  </button>
                 </div>
-                <div class="img-badge" id="imgBadge"></div>
               </div>
 
-              <input type="file" id="fileInput" accept="image/*" style="display:none"
-                onchange="handleFile(this.files[0])" />
+              <!-- Flat Minimalist Drop Zone -->
+              <div class="flat-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" role="button" tabindex="0">
+                <div class="drop-icon-wrap">
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h3 class="drop-heading">Kéo thả một hoặc NHIỀU lát cắt MRI / DICOM</h3>
+                <p class="drop-subtext">Hỗ trợ chọn nhiều file hoặc cả chuỗi Series lát cắt (Ctrl + Click hoặc Drag & Drop)</p>
+                <div class="format-pills">
+                  <span class="fmt-pill highlight-pill">Chuỗi đa lát cắt (Series)</span>
+                  <span class="fmt-pill">DICOM (.dcm)</span>
+                  <span class="fmt-pill">JPG</span>
+                  <span class="fmt-pill">PNG</span>
+                  <span class="fmt-pill">BMP / TIFF</span>
+                </div>
+              </div>
 
-              <div class="btn-row" id="btnRow" style="display:none">
-                <button class="btn btn-secondary" onclick="resetAll()"><i class="fa-solid fa-arrows-rotate"></i> Đổi
-                  ảnh</button>
-                <button class="btn btn-primary" id="analyzeBtn" onclick="analyze()">
-                  <i class="fa-solid fa-microscope"></i> Phân tích MRI
+              <!-- Multi-Slice Series Filmstrip Gallery -->
+              <div class="slice-filmstrip-container" id="sliceFilmstripContainer" style="display:none;">
+                <div class="filmstrip-header">
+                  <div class="filmstrip-title">
+                    <i class="fa-solid fa-film"></i> CHUỖI LÁT CẮT (<span id="sliceCountLabel">0</span> LÁT)
+                  </div>
+                  <div class="filmstrip-summary-badge" id="filmstripSummaryBadge"></div>
+                </div>
+                <div class="filmstrip-scroll" id="filmstripScroll"></div>
+              </div>
+
+              <!-- Image Manipulation Toolbar (Medical Tools) -->
+              <div class="medical-toolbar" id="medicalToolbar" style="display:none;">
+                <div class="tool-group">
+                  <span class="tool-label"><i class="fa-solid fa-sun"></i> Sáng</span>
+                  <input type="range" id="brightnessRange" min="50" max="180" value="100" class="tool-slider" oninput="applyImageFilters()" />
+                  <span id="brightnessVal" class="tool-val">100%</span>
+                </div>
+                <div class="tool-group">
+                  <span class="tool-label"><i class="fa-solid fa-circle-half-stroke"></i> Tương phản</span>
+                  <input type="range" id="contrastRange" min="50" max="220" value="100" class="tool-slider" oninput="applyImageFilters()" />
+                  <span id="contrastVal" class="tool-val">100%</span>
+                </div>
+                <div class="tool-actions">
+                  <button type="button" class="tool-btn" id="invertBtn" onclick="toggleInvert()" title="Đảo màu âm bản">
+                    <i class="fa-solid fa-circle-notch"></i> Âm bản
+                  </button>
+                  <button type="button" class="tool-btn" onclick="adjustZoom(0.15)" title="Phóng to">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                  </button>
+                  <button type="button" class="tool-btn" onclick="adjustZoom(-0.15)" title="Thu nhỏ">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                  </button>
+                  <button type="button" class="tool-btn" onclick="resetImageFilters()" title="Khôi phục gốc">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Image Viewport Container -->
+              <div class="minimal-viewport" id="imgWrapper">
+                <div class="viewport-canvas-container" id="viewportContainer">
+                  <img id="previewImg" src="" alt="MRI Preview" />
+                </div>
+                
+                <!-- Minimal Scanning Line -->
+                <div class="laser-scanner" id="scanOverlay">
+                  <div class="laser-line"></div>
+                </div>
+
+                <div class="status-overlay-tag" id="imgBadge"></div>
+              </div>
+
+              <input type="file" id="fileInput" accept="image/*,.dcm" multiple style="display:none" onchange="handleFiles(this.files)" />
+
+              <div class="button-action-group" id="btnRow" style="display:none">
+                <button type="button" class="btn btn-outline" onclick="resetAll()">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Chọn chuỗi khác
+                </button>
+                <button type="button" class="btn btn-solid" id="analyzeBtn" onclick="analyze()">
+                  <i class="fa-solid fa-microscope"></i> Phân tích toàn bộ chuỗi
                 </button>
               </div>
 
-              <div class="error-box" id="errorBox"></div>
+              <div class="flat-error-box" id="errorBox"></div>
             </div>
           </div>
 
-          <!-- Grad-CAM section -->
-          <div class="card gradcam-section" id="gradcamCard" style="display:none; margin-top:16px;">
-            <div class="card-header">
-              <span><i class="fa-solid fa-fire-flame-curved"></i></span>
-              <span class="card-title">Grad-CAM++ · Vùng AI quan sát</span>
+          <!-- Bento Box: Patient & Clinical Info Form -->
+          <div class="bento-box margin-top-box" id="patientInfoCard">
+            <div class="os-window-header">
+              <div class="os-title"><i class="fa-solid fa-hospital-user"></i> THÔNG TIN BỆNH NHÂN & CA KHÁM</div>
+              <button type="button" class="mini-tool-btn" onclick="generateSamplePatient()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo thông tin mẫu
+              </button>
             </div>
-            <div class="card-body">
-              <div class="gradcam-tabs" id="gradcamTabs"></div>
-              <div class="gradcam-img-wrap">
-                <img id="gradcamImg" src="" alt="Grad-CAM" />
-                <div class="gradcam-legend">
-                  <span style="font-size:10px;color:#aaa;font-family:var(--mono)">Thấp</span>
-                  <div class="legend-bar"></div>
-                  <span style="font-size:10px;color:#aaa;font-family:var(--mono)">Cao</span>
+            <div class="bento-content patient-form-content">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="patientId">MÃ BỆNH NHÂN (ID)</label>
+                  <input type="text" id="patientId" class="form-input" placeholder="BN-2026-XXXX" value="BN-2026-0891" />
+                </div>
+                <div class="form-field">
+                  <label for="patientName">HỌ VÀ TÊN BỆNH NHÂN</label>
+                  <input type="text" id="patientName" class="form-input" placeholder="Nguyễn Văn A" value="Trần Thị Mai" />
+                </div>
+                <div class="form-field">
+                  <label for="patientAge">TUỔI / NĂM SINH</label>
+                  <input type="text" id="patientAge" class="form-input" placeholder="45" value="48 tuổi" />
+                </div>
+                <div class="form-field">
+                  <label for="patientGender">GIỚI TÍNH</label>
+                  <select id="patientGender" class="form-select">
+                    <option value="Nữ" selected>Nữ</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="patientDoctor">BÁC SĨ CHỈ ĐỊNH / ĐỌC KẾT QUẢ</label>
+                  <input type="text" id="patientDoctor" class="form-input" placeholder="BS. CKII..." value="BS. CKII Nguyễn Hoàng Nam" />
+                </div>
+                <div class="form-field">
+                  <label for="patientModality">THIẾT BỊ / CHUỖI XUNG</label>
+                  <input type="text" id="patientModality" class="form-input" placeholder="MRI Sọ Não (T1/T2/FLAIR)" value="MRI 1.5T Sọ Não Axial T1-CE" />
+                </div>
+                <div class="form-field full-width">
+                  <label for="patientSymptoms">TRIỆU CHỨNG LÂM SÀNG / LÝ DO KHÁM</label>
+                  <input type="text" id="patientSymptoms" class="form-input" placeholder="Đau đầu nửa đầu kéo dài, chóng mặt, buồn nôn..." value="Đau đầu âm ỉ vùng trán đính 2 tháng, giảm thị lực mắt phải." />
                 </div>
               </div>
-              <p style="margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--mono)">
-                Vùng màu đỏ/vàng = AI tập trung quan sát mạnh nhất
+            </div>
+          </div>
+
+          <!-- Bento Box: Grad-CAM++ Visualization -->
+          <div class="bento-box margin-top-box" id="gradcamCard" style="display:none;">
+            <div class="os-window-header">
+              <div class="os-title"><i class="fa-solid fa-eye"></i> GRAD-CAM++ VISUAL ATTENTION</div>
+              <div class="view-switch">
+                <button class="switch-btn active" id="viewOverlayBtn" onclick="setGradcamViewMode('overlay')">Chập ảnh</button>
+                <button class="switch-btn" id="viewSplitBtn" onclick="setGradcamViewMode('split')">So sánh 1:1</button>
+              </div>
+            </div>
+
+            <div class="bento-content">
+              <div class="tab-list" id="gradcamTabs"></div>
+
+              <!-- Overlay Display -->
+              <div class="gradcam-view-wrap" id="gradcamSingleDisplay">
+                <div class="gradcam-frame">
+                  <img id="gradcamImg" src="" alt="Grad-CAM++ Overlay" />
+                  <div class="minimal-legend">
+                    <span>Mật độ thấp</span>
+                    <div class="legend-bar"></div>
+                    <span>Mật độ cao</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Split Comparison Display -->
+              <div class="gradcam-split-grid" id="gradcamSplitDisplay" style="display:none;">
+                <div class="split-frame">
+                  <span class="frame-tag">Ảnh Gốc</span>
+                  <img id="gradcamOriginalCompare" src="" alt="Original MRI" />
+                </div>
+                <div class="split-frame">
+                  <span class="frame-tag">Vùng AI quan sát</span>
+                  <img id="gradcamHeatmapCompare" src="" alt="Heatmap" />
+                </div>
+              </div>
+
+              <p class="gradcam-caption">
+                Vùng màu ấm (đỏ/vàng) thể hiện cấu trúc mô não được mạng nơ-ron đánh giá có xác suất tổn thương cao nhất.
               </p>
             </div>
           </div>
+
         </div>
 
-        <!-- ── RIGHT: Results ── -->
-        <div>
-          <div class="card" style="min-height:400px;">
-            <div class="card-header">
-              <span><i class="fa-solid fa-chart-column"></i></span>
-              <span class="card-title">Kết quả phân tích</span>
+        <!-- RIGHT COLUMN: Clinical Results & Diagnosis -->
+        <div class="grid-column">
+          
+          <div class="bento-box min-height-box">
+            <div class="os-window-header">
+              <div class="os-title"><i class="fa-solid fa-notes-medical"></i> BÁO CÁO KẾT QUẢ CHẨN ĐOÁN</div>
+              <div class="header-action-btns" id="reportActionButtons" style="display:none;">
+                <button type="button" class="action-pill-btn btn-export-pdf" onclick="exportMedicalReportPDF()" title="Xuất Báo Cáo Y Tế PDF">
+                  <i class="fa-solid fa-file-pdf"></i> Xuất PDF
+                </button>
+                <button type="button" class="action-pill-btn btn-print-sheet" onclick="printMedicalReport()" title="In Phiếu Kết Quả">
+                  <i class="fa-solid fa-print"></i> In Phiếu
+                </button>
+              </div>
             </div>
-            <div class="card-body" id="resultBody">
-              <div class="result-empty">
-                <span><i class="fa-solid fa-chart-column"></i></span>
-                <p>Tải ảnh MRI và nhấn<br /><strong style="color:var(--accent)">Phân tích MRI</strong><br />để xem kết
-                  quả</p>
+
+            <div class="bento-content" id="resultBody">
+              <div class="editorial-empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-file-waveform"></i></div>
+                <h3 class="empty-title">Chưa có dữ liệu phân tích</h3>
+                <p class="empty-desc">Tải ảnh MRI (hoặc DICOM .dcm) hoặc chọn mẫu thử nhanh để bắt đầu quy trình chẩn đoán AI.</p>
               </div>
             </div>
           </div>
 
-          <!-- Per-model comparison -->
-          <!-- <div class="card" id="modelCompareCard" style="display:none; margin-top:16px;">
-            <div class="card-header">
-              <span><i class="fa-solid fa-scale-balanced"></i></span>
-              <span class="card-title">So sánh từng mô hình</span>
-            </div>
-            <div class="card-body">
-              <div class="model-compare" id="modelCompare"></div>
-            </div>
-          </div> -->
         </div>
 
       </div>
     </div>
   </main>
 
-  <footer>
-    <div class="container">
-      NEUROSCAN AI · EFFICIENTNET-V2-S + Grad-CAM++ · PyTorch ·
-      Dữ liệu: Kaggle Brain Tumor MRI Dataset
+  <!-- ======================================================================== -->
+  <!-- HIDDEN MEDICAL REPORT TEMPLATE (USED FOR PDF EXPORT & HIGH-RES PRINTING) -->
+  <!-- ======================================================================== -->
+  <div id="medicalReportContainer" style="display:none;">
+    <div id="medicalReportTemplate" class="medical-report-sheet">
+      
+      <!-- Hospital Header -->
+      <div class="report-header">
+        <div class="report-logo-group">
+          <img src="{{ url_for('static', filename='logobrain.png') }}" class="report-logo" alt="Logo">
+          <div>
+            <h2 class="report-hospital-name">TRUNG TÂM CHẨN ĐOÁN HÌNH ẢNH & THẦN KINH NEUROSCAN AI</h2>
+            <div class="report-hospital-meta">Hệ thống hỗ trợ chẩn đoán lâm sàng tích hợp Trí tuệ Nhân tạo & XAI</div>
+            <div class="report-hospital-address">Đ/c: Số 01 Đại Cồ Việt, Hai Bà Trưng, Hà Nội | Hotline: 1900 6868 | Email: contact@neuroscan.ai</div>
+          </div>
+        </div>
+        <div class="report-code-block">
+          <div class="report-qr-mock"><i class="fa-solid fa-qrcode"></i></div>
+          <div class="report-doc-id" id="repDocId">SCAN-20260827-01</div>
+        </div>
+      </div>
+
+      <div class="report-divider-thick"></div>
+
+      <!-- Report Title -->
+      <div class="report-main-title">
+        <h1>PHIẾU KẾT QUẢ CHẨN ĐOÁN HÌNH ẢNH CỘNG HƯỞNG TỪ NÃO (MRI)</h1>
+        <span class="report-subtitle">Phân tích tổn thương não bộ tích hợp Explainable AI (Grad-CAM++)</span>
+      </div>
+
+      <!-- Patient Information Table -->
+      <div class="report-section-box">
+        <div class="report-section-title"><i class="fa-solid fa-user-doctor"></i> THÔNG TIN BỆNH NHÂN & CA KHÁM</div>
+        <table class="report-info-table">
+          <tr>
+            <td class="tb-label">Họ và tên:</td>
+            <td class="tb-val" id="repPatientName">Trần Thị Mai</td>
+            <td class="tb-label">Mã bệnh nhân:</td>
+            <td class="tb-val" id="repPatientId">BN-2026-0891</td>
+          </tr>
+          <tr>
+            <td class="tb-label">Tuổi / Giới tính:</td>
+            <td class="tb-val"><span id="repPatientAge">48 tuổi</span> / <span id="repPatientGender">Nữ</span></td>
+            <td class="tb-label">Ngày thực hiện:</td>
+            <td class="tb-val" id="repScanDate">27/08/2026 21:00</td>
+          </tr>
+          <tr>
+            <td class="tb-label">Bác sĩ chỉ định:</td>
+            <td class="tb-val" id="repDoctor">BS. CKII Nguyễn Hoàng Nam</td>
+            <td class="tb-label">Chỉ định chụp:</td>
+            <td class="tb-val" id="repModality">MRI Sọ Não Axial T1-CE</td>
+          </tr>
+          <tr>
+            <td class="tb-label">Triệu chứng lâm sàng:</td>
+            <td class="tb-val" colspan="3" id="repSymptoms">Đau đầu âm ỉ vùng trán đính 2 tháng, giảm thị lực mắt phải.</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Medical Visual Evidence (Dual Image Comparison) -->
+      <div class="report-section-box">
+        <div class="report-section-title"><i class="fa-solid fa-images"></i> HÌNH ẢNH LÂM SÀNG & BẢN ĐỒ KÍCH HOẠT XAI GRAD-CAM++</div>
+        <div class="report-dual-images">
+          <div class="report-img-card">
+            <div class="report-img-header">ẢNH GỐC CỘNG HƯỞNG TỪ (ORIGINAL MRI)</div>
+            <img id="repOriginalImg" src="" alt="Ảnh gốc MRI" />
+            <div class="report-img-caption">Lát cắt trục ngang não bộ chuẩn hóa tiền xử lý</div>
+          </div>
+          <div class="report-img-card">
+            <div class="report-img-header">BẢN ĐỒ NHIỆT GRAD-CAM++ (AI VISUAL ATTENTION)</div>
+            <img id="repGradcamImg" src="" alt="Grad-CAM Heatmap" />
+            <div class="report-img-caption">Vùng màu ấm (đỏ/vàng) chỉ thị vị trí tổn thương trọng yếu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Quantitative Findings & Classification -->
+      <div class="report-section-box">
+        <div class="report-section-title"><i class="fa-solid fa-chart-simple"></i> PHÂN TÍCH ĐỊNH LƯỢNG MÔ HÌNH TRÍ TUỆ NHÂN TẠO (EFFICIENTNET-V2-S)</div>
+        <div class="report-summary-banner" id="repSummaryBanner">
+          <div class="rep-finding-lead">
+            <span>KẾT LUẬN AI:</span>
+            <strong id="repClassVi">U MÀNG NÃO (MENINGIOMA)</strong>
+          </div>
+          <div class="rep-conf-badge" id="repConfBadge">ĐỘ TIN CẬY: 98.65%</div>
+        </div>
+
+        <table class="report-prob-table">
+          <thead>
+            <tr>
+              <th>Phân Lớp Bệnh Lý</th>
+              <th>Thuật Ngữ Y Khoa</th>
+              <th>Xác Suất Dự Báo (%)</th>
+              <th>Đánh Giá Nguy Cơ</th>
+            </tr>
+          </thead>
+          <tbody id="repProbTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Clinical Conclusion & Recommendations -->
+      <div class="report-section-box">
+        <div class="report-section-title"><i class="fa-solid fa-clipboard-check"></i> NHẬN ĐỊNH & KHUYẾN NGHỊ LÂM SÀNG</div>
+        <div class="report-recom-box" id="repRecommendation">
+          Phát hiện khối choán chỗ có đặc điểm hình thái phù hợp với u màng não (meningioma). Khuyến nghị chụp MRI sọ não có tiêm thuốc cản từ (Gadolinium) và hội chẩn chuyên khoa Phẫu thuật Thần kinh.
+        </div>
+      </div>
+
+      <!-- Signatures & Footnotes -->
+      <div class="report-footer-signatures">
+        <div class="sig-col">
+          <div class="sig-title">HỆ THỐNG XỬ LÝ NEUROSCAN AI</div>
+          <div class="sig-badge"><i class="fa-solid fa-shield-halved"></i> ĐÃ XÁC THỰC MÔ HÌNH</div>
+          <div class="sig-meta">EfficientNet-V2-S Pipeline v3.5<br>Thời gian phản hồi: &lt; 300ms</div>
+        </div>
+        <div class="sig-col right-align">
+          <div class="sig-date" id="repSigDate">Hà Nội, ngày 27 tháng 08 năm 2026</div>
+          <div class="sig-title">BÁC SĨ CHUYÊN KHOA CHẨN ĐOÁN HÌNH ẢNH</div>
+          <div class="sig-space"></div>
+          <div class="sig-name" id="repSigDoctor">BS. CKII Nguyễn Hoàng Nam</div>
+        </div>
+      </div>
+
+      <div class="report-bottom-disclaimer">
+        * Lưu ý: Kết quả phân tích do mô hình AI hỗ trợ, dùng cho mục đích tham khảo và sàng lọc chuyên sâu. Kết luận điều trị chính thức cần được bác sĩ chuyên khoa phê duyệt.
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container-wide footer-inner">
+      <div class="footer-meta">
+        <span class="meta-brand">NeuroScan AI Protocol</span> &bull; 
+        <span>PyTorch EfficientNet-V2-S Architecture</span> &bull; 
+        <span>Dataset Kaggle Brain Tumor (1,311 Independent Test Scans)</span>
+      </div>
+      <div class="footer-tags">
+        <span class="mini-tag">Python 3.13</span>
+        <span class="mini-tag">OpenCV</span>
+        <span class="mini-tag">PyTorch CUDA</span>
+        <span class="mini-tag">pydicom 3.0</span>
+        <span class="mini-tag">html2pdf.js</span>
+      </div>
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=4.1"></script>
 </body>
 
 </html>
