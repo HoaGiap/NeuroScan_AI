@@ -1,6 +1,7 @@
 # Models and Large Files
 checkpoints/
 data/
+sample_dicoms/
 *.h5
 *.pth
 *.pt

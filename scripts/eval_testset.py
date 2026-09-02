@@ -3,11 +3,17 @@ eval_testset.py — Script đánh giá độ chính xác mô hình trên tập k
 """
 import os
 import sys
+from pathlib import Path
 import glob
 import argparse
 import torch
 
 sys.stdout.reconfigure(encoding="utf-8")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+os.chdir(ROOT_DIR)
+
 from tqdm import tqdm
 from src.dataset import BrainTumorDataset, CLASS_NAMES
 from src.inference.engine import InferenceEngine

@@ -59,13 +59,13 @@ Sau khi huấn luyện xong, mô hình có độ chính xác cao nhất sẽ đ�
 
 ### 🔹 1. Kiểm tra độ chính xác trên Tập Test độc lập (`data/Testing`):
 ```bash
-python eval_testset.py
+python scripts/eval_testset.py
 ```
 *Kết quả sẽ hiển thị tỉ lệ dự đoán đúng (%) chi tiết cho từng loại u.*
 
 ### 🔹 2. Kiểm tra thuật toán Tiền xử lý Auto-Crop sát viền não:
 ```bash
-python test_crop_demo.py
+python scripts/test_crop_demo.py
 ```
 
 ---
@@ -84,7 +84,7 @@ Truy cập đường dẫn: **`http://localhost:5000`**
 ### 🔹 3. Kiểm tra tự động các API endpoint:
 (Mở một Terminal khác trong khi `app.py` đang chạy):
 ```bash
-python test_demo.py
+python scripts/test_demo.py
 ```
 
 ---

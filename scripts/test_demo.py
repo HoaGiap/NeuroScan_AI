@@ -1,9 +1,15 @@
 """Quick test script to verify the API works before presentation demo."""
+import os
 import requests
 import json
 import sys
+from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+os.chdir(ROOT_DIR)
 
 BASE_URL = "http://localhost:5000"
 
